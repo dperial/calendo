@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: application/json");
-include 'db_connect.php';
+include '../db_connect.php';
 
 $id = $_GET['id'];
 $sql = "DELETE FROM recurring_appointments WHERE id=?";

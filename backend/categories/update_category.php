@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: application/json");
-include './db_connect.php';
+include '../db_connect.php';
 
 $id = $_GET['id'];
 $data = json_decode(file_get_contents("php://input"), true);

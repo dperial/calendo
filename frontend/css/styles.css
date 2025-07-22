@@ -1,0 +1,45 @@
+/* Dashboard CSS Styles */
+  .category-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+
+  /* Optional: different background colors for specific categories */
+  .icon-health    { background-color: #c50215; } /* red */
+  .icon-work      { background-color: #063d90; } /* blue */
+  .icon-personal  { background-color: #6f42c1; } /* purple */
+  .icon-study     { background-color: #3fc920; } /* teal */
+  .icon-fitness   { background-color: #347333; } /* pink */
+  .icon-finance   { background-color: #198754; } /* green */
+  .icon-travel    { background-color: #e56700; } /* orange */
+  .icon-family    { background-color: #ffca2a; } /* yellow */
+  .icon-chores    { background-color: #6c757d; } /* gray */
+  .icon-social    { background-color: #a004a2; } /* cyan */
+
+  .appointment-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 6px;
+    background-color: #fff;
+    transition: box-shadow 0.3s ease;
+    box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
+  }
+  .appointment-card:hover {
+    box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px,rgba(45, 35, 66, 0.3) 0 14px 28px -3px,#D6D6E7 0 -3px 0 inset;
+    transform: translateY(-2px);
+}
+    
+.badge {
+    font-size: 0.875rem;
+    padding: 0.5em;
+    border-radius: 12px;
+    margin-right: 0.5em;
+    margin-bottom: 0.5em;
+}
