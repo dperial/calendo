@@ -1,4 +1,17 @@
 /* Dashboard CSS Styles */
+#addAppointmentBtn {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 6px;
+    background-color: #fff;
+    color: #000000;
+    transition: box-shadow 0.3s ease;
+    box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
+}
+#addAppointmentBtn:hover {
+    box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px,rgba(45, 35, 66, 0.3) 0 14px 28px -3px,#D6D6E7 0 -3px 0 inset;
+    transform: translateY(-2px);
+}
   .category-icon {
     display: inline-flex;
     align-items: center;
@@ -62,4 +75,14 @@
 .btn-share,
 .btn-edit {
   transition: all 0.3s ease-in-out;
+}
+/* hides overflow only when collapsed */
+.truncate-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* btn-delete */
+.btn-delete {
+  cursor: pointer;
 }
