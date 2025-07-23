@@ -1,4 +1,5 @@
 import { setAppointments, wirePagerClicks, setRenderFunction } from './pagination.js';
+import { initFilters } from './filter-dashboard.js';
 
 // Utility: Format the date range
 function formatDateRange(startDate, startTime, endDate, endTime) {
@@ -91,7 +92,10 @@ async function fetchAppointments() {
   try {
     const res = await fetch("../backend/appointments/appointments.php");
     const data = await res.json();     // save full list once
+    // 1. hand full list to pagination.js
     setAppointments(data);   // setAppointments() slices & calls renderAppointments()
+    // 2. Initialize filters with the full list ( populate dropdowns )
+    initFilters(data);
   } catch (err) {
     showToast("Unable to load appointments", "danger");
   }
