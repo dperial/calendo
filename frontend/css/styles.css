@@ -43,3 +43,23 @@
     margin-right: 0.5em;
     margin-bottom: 0.5em;
 }
+
+
+/* CSS for Card-View Btn-action*/
+
+.btn-share:hover {
+  background-color: #b2e5f9 !important;   /* Bootstrap primary color */
+  color: #3492df !important;
+  border-color: #3492df !important;
+  transition: all 0.3s ease-in-out;
+}
+.btn-edit:hover {
+  background-color: #e0f7fa !important;   /* Bootstrap primary color */
+  color: #00796b !important;
+  border-color: #00796b !important;
+  transition: all 0.3s ease-in-out;
+}
+.btn-share,
+.btn-edit {
+  transition: all 0.3s ease-in-out;
+}

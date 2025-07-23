@@ -21,7 +21,12 @@ function renderAppointments(appointments) {
     container.innerHTML += `
       <div class="col-md-6 col-lg-4 mb-4">
         <div class="card appointment-card">
-          <div class="card-body">
+          <div class="card-body position-relative">
+            <!-- Top-right delete icon -->
+            <div class="position-absolute top-0 end-0 p-2">
+              <i class="bi bi-three-dots-vertical text-muted" role="button" onclick="deleteAppointment(${app.id})"></i>
+            </div>
+
             <div class="category-icon icon-${app.category.toLowerCase()}">
               <i class="bi ${app.icon_class}"></i>
             </div>
@@ -38,9 +43,26 @@ function renderAppointments(appointments) {
             </span>
             <span class="badge bg-${getStatusColor(app.status)} me-1">${app.status}</span>
             <span class="badge bg-secondary">${app.type}</span>
-            <p class="card-text mt-2">
-              ${app.description || "No description provided."}
+            <p class="card-text mt-2 description-text text-truncate d-flex justify-content-between align-items-center">
+              <span class="text-truncate">
+                ${app.description || "No description provided."}
+              </span>
+                <button class="btn rounded-5 text-primary-emphasis bg-secondary-subtle btn-more">
+                  <i class="bi bi-caret-right text-muted toggle-desc" role="button" aria-expanded="false"></i>
+                </button>
             </p>
+
+            <!-- Separator -->
+            <hr class="my-3">
+
+            <!-- Action buttons -->
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-primary-emphasis px-2 bg-secondary-subtle rounded-pill"> Created by: ${app.creator_name}</span>
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn border border-2 rounded-4 text-primary-emphasis bg-secondary-subtle btn-share"><i class="bi bi-share me-1"></i></button>
+                <button class="btn border border-2 rounded-4 text-primary-emphasis bg-secondary-subtle btn-edit"><i class="bi bi-pencil me-1"></i></button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
