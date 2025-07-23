@@ -1,4 +1,24 @@
 /* Dashboard CSS Styles */
+/* Pagination Styles */
+.paginate {
+  margin-bottom: 20px !important ;
+  ;
+}
+#pagination {
+  display: flex;              /* back to flex   */
+  width: max-content;         /* shrink-wrap    */
+  margin: 0 auto;             /* centre the ul  */
+  gap: .25rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 6px;
+  background:#fff;
+  box-shadow: rgba(45,35,66,.4) 0 2px 4px,
+              rgba(45,35,66,.3) 0 7px 13px -3px,
+              #d6d6e7 0 -3px 0 inset;
+}
+
+
 #addAppointmentBtn {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
