@@ -4,13 +4,27 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: PUT");
 ini_set('display_errors', 0); // Disable error display in production
 include '../db_connect.php';
+require_once '../helper.php'; // Include the helper functions
 
 $data = json_decode(file_get_contents("php://input"), true);
+
+/* build DateTime objects */
+$tz      = new DateTimeZone(date_default_timezone_get());
+$startDT = new DateTime($data['start_date'].' '.$data['start_time'], $tz);
+$endDT   = new DateTime($data['end_date'].' '.$data['end_time'],   $tz);
+
+
+$status  = $data['status'] ?? 'scheduled';
+
+/* ---- validate ---- */
+if ($err = validateStatusVsDates($status, $startDT, $endDT)) {
+  echo json_encode(["success"=>false,"error"=>$err]); exit;
+}
+
 $id          = $data['id']          ?? null;
 $title       = $data['title']       ?? null;
 $description = $data['description'] ?? null;
 $category_id = $data['category_id'] ?? null;
-$status      = $data['status']      ?? 'scheduled';
 $type        = $data['type']        ?? 'private';
 $start_date  = $data['start_date']  ?? null;
 $end_date    = $data['end_date']    ?? null;

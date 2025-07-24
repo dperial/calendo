@@ -15,8 +15,8 @@ function formatDateRange(startDate, startTime, endDate, endTime) {
 function getStatusColor(status) {
   switch (status.toLowerCase()) {
     case "scheduled": return "warning";
-    case "ongoing": return "success";
-    case "completed": return "secondary";
+    case "ongoing": return "info";
+    case "completed": return "success";
     case "cancelled": return "danger";
     default: return "light";
   }
@@ -184,6 +184,27 @@ function setupAppointmentFormHandler() {
     }
   });
 }
+// Utility: SuggestStatus
+function suggestStatus() {
+  const start = new Date(
+      `${appointmentForm.start_date.value}T${appointmentForm.start_time.value}`);
+  const end   = new Date(
+      `${appointmentForm.end_date.value}T${appointmentForm.end_time.value}`);
+  const now   = new Date();
+
+  let guess = "scheduled";
+  if (end <  now) guess = "completed";
+  else if (start <= now && now <= end) guess = "ongoing";
+  document.getElementById("statusSelect").value = guess;
+}
+
+/* attach listeners once */
+["start_date","start_time","end_date","end_time"].forEach(n =>
+  document.querySelector(`[name='${n}']`)
+          .addEventListener("change", suggestStatus)
+);
+// End Utility: SuggestStatus
+
 // Utility: Edit an appointment
 function wireEditButtons() {
   document
@@ -200,6 +221,7 @@ function wireEditButtons() {
       form.title.value       = app.title;
       form.description.value = app.description || "";
       form.category_id.value = app.category_id;
+      form.status.value      = app.status;
       form.start_date.value  = app.start_date;
       form.start_time.value  = app.start_time;
       form.end_date.value    = app.end_date;

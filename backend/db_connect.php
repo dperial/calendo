@@ -4,6 +4,8 @@ $username = "root";
 $password = "";
 $dbname = "calendo_db";
 
+date_default_timezone_set('Europe/Berlin');
+
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
