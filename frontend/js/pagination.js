@@ -1,7 +1,7 @@
 // Pagination.js 
 let allAppointments = [];
 let currentPage = 1;
-let pageSize = 10; // Default page size
+let pageSize = 9; // Default page size
 let renderFn = () => {}; // Function to render appointments, set by the caller, it will be injected by the main.js
 
 function setRenderFunction(fn) {

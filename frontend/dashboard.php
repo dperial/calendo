@@ -4,63 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="./css/styles.css">
-  <style>
-    body {
-      padding-top: 100px;
-    }
-    .nav-icon {
-      font-size: 1.5rem;
-    }
-    .nav-label {
-      font-size: 0.8rem;
-    }
-    .card-badge {
-      margin-right: 0.5rem;
-    }
-  </style>
+  <?php include __DIR__ . '/partials/head.php'; ?>
 </head>
 <body>
-  <!-- Fixed Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-        <div class="container-fluid d-flex justify-content-between align-items-center px-4">
-    
-        <!-- Left logo -->
-        <a href="#" class="navbar-brand d-flex align-items-center">
-        <img src="../assets/icons/calendo.svg" alt="Calendo Logo" width="40" height="32" class="me-2">
-        </a>
-
-        <!-- Right navigation -->
-        <ul class="nav text-white text-small">
-        <li class="nav-item text-center">
-            <a href="dashboard.html" class="nav-link text-white">
-            <img src="../assets/icons/dashboard.svg" width="24" height="24" class="d-block mx-auto mb-1">
-            Dashboard
-            </a>
-        </li>
-        <li class="nav-item text-center">
-            <a href="calendar.html" class="nav-link text-white">
-            <img src="../assets/icons/calendar.svg" width="24" height="24" class="d-block mx-auto mb-1">
-            Calendar
-            </a>
-        </li>
-        <li class="nav-item text-center">
-            <a href="profile.html" class="nav-link text-white">
-            <img src="../assets/icons/person-circle.svg" width="24" height="24" class="d-block mx-auto mb-1">
-            Profile
-            </a>
-        </li>
-        </ul>
-    </div>
-  </div>
-</nav>
-
+    <?php include __DIR__ . '/partials/nav.php'; ?>
   <!-- Main Content -->
   <div class="container">
     <!-- Filter Section -->
@@ -85,9 +32,9 @@
             <div class="col-auto ms-auto">
                 <label class="me-2">Show</label>
                 <select id="pageSizeSelect" class="form-select d-inline-block w-auto">
-                <option value="10" selected>10</option>
-                <option value="20">20</option>
-                <option value="30">30</option>
+                <option value="9" selected>9</option>
+                <option value="18">18</option>
+                <option value="27">27</option>
                 </select>
                 <label class="ms-2">Appointments / Page</label>
             </div>
@@ -141,7 +88,7 @@
                 </div>
                 <div class="mb-3">
                 <label class="form-label">Category</label>
-                <select name="category_id" class="form-select" required>
+                <select id="categorySelect" name="category_id" class="form-select" required>
                     <!-- Populate via JS -->
                 </select>
                 </div>
