@@ -40,7 +40,7 @@ function renderAppointments(appointments) {
             <div class="category-icon icon-${app.category.toLowerCase()}">
               <i class="bi ${app.icon_class}"></i>
             </div>
-            <h5 class="card-title">${app.title}</h5>
+            <h5 class="card-title truncate-1">${app.title}</h5>
             <!-- Date -->
             <div class="mb-2">
               <span class="badge text-primary-emphasis bg-primary-subtle d-inline-block mb-2 text-start rounded-pill">
