@@ -1,0 +1,16 @@
+{
+    "name": "kuaguim/calendo",
+    "description": "A calendar projekt in PHP, JS, HTML, CSS, Bootstrap5 and MYSQL",
+    "autoload": {
+        "psr-4": {
+            "Kuaguim\\Calendo\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "p.kuaguim-nguefack",
+            "email": "p.kuaguim-nguefack@mmkh.de"
+        }
+    ],
+    "require": {}
+}
