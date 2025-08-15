@@ -1,0 +1,5 @@
+SetEnv APP_ENV test
+SetEnv TEST_DB_NAME calendo_test
+SetEnv TEST_DB_USER root
+SetEnv TEST_DB_PASS 
+SetEnv TEST_DB_HOST 127.0.0.1

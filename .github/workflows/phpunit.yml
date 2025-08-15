@@ -1,0 +1,31 @@
+name: PHPUnit
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: calendo_test
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: xdebug
+      - name: Import schema & seed
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot calendo_test < backend/sql/schema.sql
+          mysql -h 127.0.0.1 -uroot -proot calendo_test < backend/sql/insert_sample_data.sql
+      - name: Run tests
+        run: php tools/phpunit.phar -c phpunit.xml
+        env:
+          TEST_DSN: "mysql:host=127.0.0.1;dbname=calendo_test;charset=utf8mb4"
+          TEST_USER: "root"
+          TEST_PASS: "root"

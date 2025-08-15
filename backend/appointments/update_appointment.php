@@ -1,61 +1,145 @@
 <?php
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: PUT");
-ini_set('display_errors', 0); // Disable error display in production
-include '../db_connect.php';
-require_once '../helper.php'; // Include the helper functions
+header("Access-Control-Allow-Methods: PUT, POST");
 
-$data = json_decode(file_get_contents("php://input"), true);
+require_once __DIR__ . '/../helper.php';
+date_default_timezone_set('Europe/Berlin');
 
-/* build DateTime objects */
-$tz      = new DateTimeZone(date_default_timezone_get());
-$startDT = new DateTime($data['start_date'].' '.$data['start_time'], $tz);
-$endDT   = new DateTime($data['end_date'].' '.$data['end_time'],   $tz);
+try {
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
+    if ($method !== 'PUT' && $method !== 'POST') {
+        http_response_code(405);
+        echo json_encode(["success" => false, "error" => "Method not allowed"]);
+        exit;
+    }
 
+    $raw = file_get_contents("php://input");
+    if ($raw === '' || $raw === false) {
+        throw new RuntimeException("Empty request body");
+    }
 
-$status  = $data['status'] ?? 'scheduled';
+    $data = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
 
-/* ---- validate ---- */
-if ($err = validateStatusVsDates($status, $startDT, $endDT)) {
-  echo json_encode(["success"=>false,"error"=>$err]); exit;
-}
+    // ------- required fields -------
+    $id         = isset($data['id']) ? (int)$data['id'] : 0;
+    $title      = trim((string)($data['title']      ?? ''));
+    $start_date =            (string)($data['start_date'] ?? '');
+    $start_time =            (string)($data['start_time'] ?? '');
 
-$id          = $data['id']          ?? null;
-$title       = $data['title']       ?? null;
-$description = $data['description'] ?? null;
-$category_id = $data['category_id'] ?? null;
-$type        = $data['type']        ?? 'private';
-$start_date  = $data['start_date']  ?? null;
-$end_date    = $data['end_date']    ?? null;
-$start_time  = $data['start_time']  ?? null;
-$end_time    = $data['end_time']    ?? null;
-if (!$id || !$title || !$start_date || !$start_time) {
-    echo json_encode(["success" => false, "error" => "Missing required fields."]);
-    exit;
-}
+    if ($id <= 0 || $title === '' || $start_date === '' || $start_time === '') {
+        http_response_code(422);
+        echo json_encode([
+            "success" => false,
+            "error"   => "Missing required fields: id, title, start_date, start_time"
+        ]);
+        exit;
+    }
 
-$sql = "UPDATE appointments SET title=?, description=?, category_id=?, status=?, type=?, start_date=?, end_date=?, start_time=?, end_time=? WHERE id=?";
+    // ------- optional / defaults -------
+    $description = array_key_exists('description', $data) ? (string)$data['description'] : null;
+    $category_id = array_key_exists('category_id', $data) ? (int)$data['category_id']    : null;
+    $status      = (string)($data['status'] ?? 'scheduled');
+    $type        = (string)($data['type']   ?? 'private');
+    $end_date    = (string)($data['end_date'] ?? $start_date);
+    $end_time    = (string)($data['end_time'] ?? $start_time);
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ssissssssi", 
-    $title, $description, $category_id, $status, $type,
-    $start_date, $end_date, $start_time, $end_time, $id    
-);
+    // ------- validate status vs dates -------
+    $tz      = new DateTimeZone(date_default_timezone_get());
+    $startDT = new DateTime("$start_date $start_time", $tz);
+    $endDT   = new DateTime("$end_date $end_time",   $tz);
 
-if ($stmt->execute() && $stmt->affected_rows) {
-    echo json_encode([
-        "success" => true, 
-        "message" => "Appointment updated successfully."
+    if ($err = validateStatusVsDates($status, $startDT, $endDT)) {
+        http_response_code(422);
+        echo json_encode(["success" => false, "error" => $err]);
+        exit;
+    }
+
+    // ------- PDO connection (env-aware) -------
+    // Old way
+    // $env = getenv('APP_ENV') ?: (defined('APP_ENV') ? APP_ENV : 'prod');
+    // Better: Only honor APP_ENV when running under CLI (phpunit), never in Apache/Nginx
+    $isCli = (PHP_SAPI === 'cli');
+    $env   = $isCli ? (getenv('APP_ENV') ?: (defined('APP_ENV') ? APP_ENV : 'prod')) : 'prod';
+    if ($env === 'test') {
+        $dbHost = getenv('TEST_DB_HOST') ?: '127.0.0.1';
+        $dbName = getenv('TEST_DB_NAME') ?: 'calendo_test';
+        $dbUser = getenv('TEST_DB_USER') ?: 'root';
+        $dbPass = getenv('TEST_DB_PASS') ?: '';
+    } else {
+        $dbHost = getenv('DB_HOST') ?: '127.0.0.1';
+        $dbName = getenv('DB_NAME') ?: 'calendo_db';
+        $dbUser = getenv('DB_USER') ?: 'root';
+        $dbPass = getenv('DB_PASS') ?: '';
+    }
+
+    $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
+    $pdo = new PDO(
+        $dsn, $dbUser, $dbPass,
+        [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]
+    );
+    $whichDb = $pdo->query('SELECT DATABASE()')->fetchColumn();
+    error_log("UPDATE endpoint: env={$env} db={$whichDb} id={$id}");
+    // First check if the record exists
+    $exists = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE id=:id");
+    $exists->execute([':id' => $id]);
+    if ((int)$exists->fetchColumn() === 0) {
+        http_response_code(404);
+        echo json_encode([
+            "success" => false, 
+            "error" => "Appointment not found",
+            "debug"   => ["env" => $env, "db" => $whichDb ?? null, "id" => $id]
+        ]);
+        exit;
+    }
+
+    // ------- UPDATE -------
+    $sql = <<<SQL
+        UPDATE appointments
+           SET title       = :title,
+               description = :description,
+               category_id = :category_id,
+               status      = :status,
+               type        = :type,
+               start_date  = :start_date,
+               end_date    = :end_date,
+               start_time  = :start_time,
+               end_time    = :end_time
+         WHERE id          = :id
+    SQL;
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':title'       => $title,
+        ':description' => $description,
+        ':category_id' => $category_id,
+        ':status'      => $status,
+        ':type'        => $type,
+        ':start_date'  => $start_date,
+        ':end_date'    => $end_date,
+        ':start_time'  => $start_time,
+        ':end_time'    => $end_time,
+        ':id'          => $id,
     ]);
-} else {
-    echo json_encode([
-  "success"   => false,
-  "error"     => "Failed to update appointment.",
-  "sql_error" => $stmt->error
-]);
-$stmt->close();
-$conn->close();
-exit;
+
+    // rowCount() can be 0 if values are identical; treat as success with “no changes”
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(["success" => true, "message" => "Appointment updated successfully."]);
+    } else {
+        echo json_encode(["success" => true, "message" => "No changes were applied."]);
+    }
+} catch (JsonException $e) {
+    http_response_code(400);
+    echo json_encode(["success"=>false, "error"=>"Invalid JSON", "detail"=>$e->getMessage()]);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(["success"=>false, "error"=>"Database error", "detail"=>$e->getMessage()]);
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(["success"=>false, "error"=>"Server exception", "detail"=>$e->getMessage()]);
 }
-?>
