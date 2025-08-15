@@ -57,11 +57,13 @@ try {
     }
 
     // ------- PDO connection (env-aware) -------
-    // Old way
-    // $env = getenv('APP_ENV') ?: (defined('APP_ENV') ? APP_ENV : 'prod');
     // Better: Only honor APP_ENV when running under CLI (phpunit), never in Apache/Nginx
     $isCli = (PHP_SAPI === 'cli');
     $env   = $isCli ? (getenv('APP_ENV') ?: (defined('APP_ENV') ? APP_ENV : 'prod')) : 'prod';
+    // Allow forcing the test database via query param or header (see db_connect.php)
+    if (isset($_SERVER['HTTP_X_TEST_ENV']) || (($_GET['env'] ?? '') === 'test')) {
+        $env = 'test';
+    }
     if ($env === 'test') {
         $dbHost = getenv('TEST_DB_HOST') ?: '127.0.0.1';
         $dbName = getenv('TEST_DB_NAME') ?: 'calendo_test';

@@ -12,7 +12,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'POST') === 'OPTIONS') {
 
 error_reporting(E_ALL);
 ini_set('log_errors', '1');
-// ini_set('display_errors', '1'); // enable locally if needed
 
 try {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
@@ -39,7 +38,10 @@ try {
     // ---------- PDO connection (env-aware; CLI=tests use test DB, web uses prod) ----------
     $isCli = (PHP_SAPI === 'cli');
     $env   = $isCli ? (getenv('APP_ENV') ?: (defined('APP_ENV') ? APP_ENV : 'prod')) : 'prod';
-
+    // Allow forcing the test database via query param or header (see db_connect.php)
+    if (isset($_SERVER['HTTP_X_TEST_ENV']) || (($_GET['env'] ?? '') === 'test')) {
+        $env = 'test';
+    }
     if ($env === 'test') {
         $dbHost = getenv('TEST_DB_HOST') ?: '127.0.0.1';
         $dbName = getenv('TEST_DB_NAME') ?: 'calendo_test';
@@ -92,4 +94,3 @@ try {
     http_response_code(500);
     echo json_encode(["success" => false, "error" => "Server exception", "detail" => $e->getMessage()]);
 }
-  

@@ -22,9 +22,9 @@ final class DeleteTest extends FeatureTestCase
 
         // Call endpoint and FORCE test DB (both header + query are accepted by your script)
         $url     = base_url() . '/backend/appointments/delete_appointment.php?env=test';
-        $headers = ['X-Test-Env: 1', 'Content-Type: application/json'];
+        // $headers = ['X-Test-Env: 1', 'Content-Type: application/json'];
 
-        [$code, $body, $err] = http_post_json($url, ['id' => $appId], $headers);
+        [$code, $body, $err] = http_post_json($url, ['id' => $appId], ['X-Test-Env: 1']);
         $this->assertSame(200, $code, "Delete HTTP $code ($err): $body");
 
         $json = json_decode($body, true);
@@ -41,9 +41,9 @@ final class DeleteTest extends FeatureTestCase
     public function testDeleteWithoutIdReturns422(): void
     {
         $url     = base_url() . '/backend/appointments/delete_appointment.php?env=test';
-        $headers = ['X-Test-Env: 1', 'Content-Type: application/json'];
+        // $headers = ['X-Test-Env: 1', 'Content-Type: application/json'];
 
-        [$code, $body, $err] = http_post_json($url, [], $headers);
+        [$code, $body, $err] = http_post_json($url, [], ['X-Test-Env: 1']);
         $this->assertSame(422, $code, "Expected 422, got $code ($err): $body");
 
         $json = json_decode($body, true);
@@ -55,10 +55,10 @@ final class DeleteTest extends FeatureTestCase
     public function testDeleteNonExistingReturnsFalse(): void
     {
         $url     = base_url() . '/backend/appointments/delete_appointment.php?env=test';
-        $headers = ['X-Test-Env: 1', 'Content-Type: application/json'];
+        // $headers = ['X-Test-Env: 1', 'Content-Type: application/json'];
 
         $nonId = 99999999;
-        [$code, $body, $err] = http_post_json($url, ['id' => $nonId], $headers);
+        [$code, $body, $err] = http_post_json($url, ['id' => $nonId], ['X-Test-Env: 1']);
         $this->assertSame(200, $code, "Delete HTTP $code ($err): $body");
 
         $json = json_decode($body, true);

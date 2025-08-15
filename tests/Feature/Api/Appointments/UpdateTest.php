@@ -22,7 +22,7 @@ final class UpdateTest extends FeatureTestCase {
       'end_time'    => '11:00',
     ];
 
-    [$cCode, $cBody, $cErr] = http_post_json("$base/backend/appointments/create_appointment.php", $createPayload);
+    [$cCode, $cBody, $cErr] = http_post_json("$base/backend/appointments/create_appointment.php", $createPayload, ['X-Test-Env: 1']);
     $this->assertSame(200, $cCode, "Create HTTP $cCode ($cErr): $cBody");
     $cJson = json_decode($cBody, true);
     $this->assertTrue($cJson['success'] ?? false, "Create failed: $cBody");
@@ -44,7 +44,7 @@ final class UpdateTest extends FeatureTestCase {
       'end_time'    => '13:00',
     ];
 
-    [$uCode, $uBody, $uErr] = http_post_json("$base/backend/appointments/update_appointment.php", $updatePayload);
+    [$uCode, $uBody, $uErr] = http_post_json("$base/backend/appointments/update_appointment.php", $updatePayload, ['X-Test-Env: 1']);
     $this->assertSame(200, $uCode, "Update HTTP $uCode ($uErr): $uBody");
     $uJson = json_decode($uBody, true);
     $this->assertTrue(($uJson['success'] ?? false), "Update failed: $uBody");

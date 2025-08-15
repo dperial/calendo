@@ -4,15 +4,28 @@ function base_url(): string {
     return getenv('BASE_URL') ?: 'http://localhost/calendo';
 }
 
-function http_get(string $url): array {
+function http_get(string $url, array $headers = []): array {
     $ch = curl_init($url);
+    $default = ['Accept: application/json'];
+    // Ensure test env header exists unless caller provides one
+    $allHeaders = array_merge($default, $headers);
+    $hasEnv     = false;
+    foreach ($allHeaders as $h) {
+        if (stripos($h, 'X-Test-Env:') === 0) {
+            $hasEnv = true;
+            break;
+        }
+    }
+    if (!$hasEnv) {
+        $allHeaders[] = 'X-Test-Env: 1';
+    }
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT        => 15,
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_SSL_VERIFYHOST => 0,
-        CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+        CURLOPT_HTTPHEADER     => $allHeaders,
     ]);
     $body = curl_exec($ch);
     $err  = curl_error($ch);
@@ -22,11 +35,23 @@ function http_get(string $url): array {
 }
 
 
-function http_post_json(string $url, array $payload): array {
+function http_post_json(string $url, array $payload, array $headers = []): array {
     $ch = curl_init($url);
+    $default = ['Content-Type: application/json'];
+    $allHeaders = array_merge($default, $headers);
+    $hasEnv     = false;
+    foreach ($allHeaders as $h) {
+        if (stripos($h, 'X-Test-Env:') === 0) {
+            $hasEnv = true;
+            break;
+        }
+    }
+    if (!$hasEnv) {
+        $allHeaders[] = 'X-Test-Env: 1';
+    }
     curl_setopt_array($ch, [
         CURLOPT_POST           => true,
-        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        CURLOPT_HTTPHEADER     => $allHeaders,
         CURLOPT_POSTFIELDS     => json_encode($payload, JSON_UNESCAPED_SLASHES),
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HEADER         => false,
