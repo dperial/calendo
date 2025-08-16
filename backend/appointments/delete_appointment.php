@@ -10,8 +10,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'POST') === 'OPTIONS') {
   http_response_code(204); exit; // CORS preflight
 }
 
-error_reporting(E_ALL);
-ini_set('log_errors', '1');
+require_once __DIR__ . '/../db.php';
+$pdo = getPdo();
 
 try {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
@@ -34,35 +34,6 @@ try {
         echo json_encode(["success" => false, "error" => "Missing appointment ID"]);
         exit;
     }
-
-    // ---------- PDO connection (env-aware; CLI=tests use test DB, web uses prod) ----------
-    $isCli = (PHP_SAPI === 'cli');
-    $env   = $isCli ? (getenv('APP_ENV') ?: (defined('APP_ENV') ? APP_ENV : 'prod')) : 'prod';
-    // Allow forcing the test database via query param or header (see db_connect.php)
-    if (isset($_SERVER['HTTP_X_TEST_ENV']) || (($_GET['env'] ?? '') === 'test')) {
-        $env = 'test';
-    }
-    if ($env === 'test') {
-        $dbHost = getenv('TEST_DB_HOST') ?: '127.0.0.1';
-        $dbName = getenv('TEST_DB_NAME') ?: 'calendo_test';
-        $dbUser = getenv('TEST_DB_USER') ?: 'root';
-        $dbPass = getenv('TEST_DB_PASS') ?: '';
-    } else {
-        $dbHost = getenv('DB_HOST') ?: '127.0.0.1';
-        $dbName = getenv('DB_NAME') ?: 'calendo_db';
-        $dbUser = getenv('DB_USER') ?: 'root';
-        $dbPass = getenv('DB_PASS') ?: '';
-    }
-
-    $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
-    $pdo = new PDO(
-        $dsn, $dbUser, $dbPass,
-        [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ]
-    );
 
     // ---------- Transaction ----------
     $pdo->beginTransaction();

@@ -5,7 +5,10 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: PUT, POST");
 
 require_once __DIR__ . '/../helper.php';
+require_once __DIR__ . '/../db.php';
+
 date_default_timezone_set('Europe/Berlin');
+$pdo = getPdo();
 
 try {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
@@ -56,37 +59,6 @@ try {
         exit;
     }
 
-    // ------- PDO connection (env-aware) -------
-    // Better: Only honor APP_ENV when running under CLI (phpunit), never in Apache/Nginx
-    $isCli = (PHP_SAPI === 'cli');
-    $env   = $isCli ? (getenv('APP_ENV') ?: (defined('APP_ENV') ? APP_ENV : 'prod')) : 'prod';
-    // Allow forcing the test database via query param or header (see db_connect.php)
-    if (isset($_SERVER['HTTP_X_TEST_ENV']) || (($_GET['env'] ?? '') === 'test')) {
-        $env = 'test';
-    }
-    if ($env === 'test') {
-        $dbHost = getenv('TEST_DB_HOST') ?: '127.0.0.1';
-        $dbName = getenv('TEST_DB_NAME') ?: 'calendo_test';
-        $dbUser = getenv('TEST_DB_USER') ?: 'root';
-        $dbPass = getenv('TEST_DB_PASS') ?: '';
-    } else {
-        $dbHost = getenv('DB_HOST') ?: '127.0.0.1';
-        $dbName = getenv('DB_NAME') ?: 'calendo_db';
-        $dbUser = getenv('DB_USER') ?: 'root';
-        $dbPass = getenv('DB_PASS') ?: '';
-    }
-
-    $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
-    $pdo = new PDO(
-        $dsn, $dbUser, $dbPass,
-        [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ]
-    );
-    $whichDb = $pdo->query('SELECT DATABASE()')->fetchColumn();
-    error_log("UPDATE endpoint: env={$env} db={$whichDb} id={$id}");
     // First check if the record exists
     $exists = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE id=:id");
     $exists->execute([':id' => $id]);
@@ -95,7 +67,6 @@ try {
         echo json_encode([
             "success" => false, 
             "error" => "Appointment not found",
-            "debug"   => ["env" => $env, "db" => $whichDb ?? null, "id" => $id]
         ]);
         exit;
     }

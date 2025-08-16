@@ -11,12 +11,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
   exit; // CORS preflight
 }
 
-error_reporting(E_ALL);
-ini_set('log_errors', '1');
-// ini_set('display_errors', '1'); // enable locally if needed
-
 require_once __DIR__ . '/../helper.php';
+require_once __DIR__ . '/../db.php';
+session_start();
 date_default_timezone_set('Europe/Berlin');
+
+$pdo = getPdo();
 
 try {
   if (($_SERVER['REQUEST_METHOD'] ?? 'POST') !== 'POST') {
@@ -48,12 +48,11 @@ try {
   // Optional / defaults
   $status      = (string)($data['status']      ?? 'scheduled');
   $type        = (string)($data['type']        ?? 'private');
-    if (!isset($data['user_id'])) {
-    http_response_code(422);
-    echo json_encode(["success"=>false, "error"=>"Missing required field: user_id"]);
-    exit;
-    }
-  $user_id = (int)$data['user_id'];  
+
+  $user_id = $_SESSION['user_id'] ?? (int)($data['user_id'] ?? 2);
+  if ($user_id === 2 && !isset($_SESSION['user_id']) && !isset($data['user_id'])) {
+    error_log('create_appointment: user_id missing; defaulting to 2');
+  }
   $description = array_key_exists('description', $data) ? (string)$data['description'] : null;
   $category_id = array_key_exists('category_id', $data) ? (int)$data['category_id']    : null;
 
@@ -70,27 +69,6 @@ try {
     echo json_encode(["success"=>false,"error"=>$err]);
     exit;
   }
-
-  // -------- PDO connection (env-aware) --------
-  $env = getenv('APP_ENV') ?: (defined('APP_ENV') ? APP_ENV : 'prod');
-  if ($env === 'test') {
-    $dbHost = getenv('TEST_DB_HOST') ?: '127.0.0.1';
-    $dbName = getenv('TEST_DB_NAME') ?: 'calendo_test';
-    $dbUser = getenv('TEST_DB_USER') ?: 'root';
-    $dbPass = getenv('TEST_DB_PASS') ?: '';
-  } else {
-    $dbHost = getenv('DB_HOST') ?: '127.0.0.1';
-    $dbName = getenv('DB_NAME') ?: 'calendo_db';
-    $dbUser = getenv('DB_USER') ?: 'root';
-    $dbPass = getenv('DB_PASS') ?: '';
-  }
-
-  $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
-  $pdo = new PDO($dsn, $dbUser, $dbPass, [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-  ]);
 
   // -------- Insert --------
   $sql = <<<SQL

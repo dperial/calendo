@@ -208,5 +208,7 @@ export async function fetchAppointments(){
 
 /* keep getFormJSON utility for compatibility */
 export function getFormJSON(form){
-  const d=Object.fromEntries(new FormData(form).entries()); d.user_id=1; return d;
+  const d=Object.fromEntries(new FormData(form).entries()); 
+  d.user_id=2; 
+  return d;
 }
