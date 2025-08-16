@@ -2,16 +2,14 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
-include '../db_connect.php';
+// include '../db_connect.php';
+require_once __DIR__ . '/../db.php';
+$pdo = getPdo();
 
 $sql = "SELECT c.* FROM categories c ORDER BY c.name";
-$result = $conn->query($sql);
-
-$categories = [];
-
-while ($row = $result->fetch_assoc()) {
-    $categories[] = $row;
-}
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo json_encode($categories);
 ?>

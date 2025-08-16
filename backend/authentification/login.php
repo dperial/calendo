@@ -1,7 +1,9 @@
 <?php
 session_start();
 header("Content-Type: application/json");
-include '../db_connect.php';
+// include '../db_connect.php';
+require_once __DIR__ . '/../db.php';
+$pdo = getPdo();
 
 $data = json_decode(file_get_contents("php://input"), true);
 $email = $data['email'];
@@ -11,12 +13,11 @@ if (empty($email) || empty($password)) {
     exit;
 }
 $sql = "SELECT * FROM users WHERE email=?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$email]);
+$user = $stmt->fetch();
 
-if ($user = $result->fetch_assoc()) {
+if ($user) {
     if (password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         echo json_encode(["message" => "Login successful", "user" => $user]);

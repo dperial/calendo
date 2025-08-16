@@ -2,12 +2,9 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
-include '../db_connect.php';
-
-// Always set charset where possible
-if ($conn instanceof mysqli) {
-    mysqli_set_charset($conn, 'utf8mb4');
-}
+require_once __DIR__ . '/../helper.php';
+require_once __DIR__ . '/../db.php';
+$pdo = getPdo();
 
 $sql = "
     SELECT
@@ -23,46 +20,8 @@ $sql = "
 
 try {
     $appointments = [];
-
-    if ($conn instanceof PDO) {
-        // PDO path
-        $stmt = $conn->query($sql);
-        if (!$stmt) {
-            http_response_code(500);
-            echo json_encode([
-                "success" => false,
-                "error"   => "Query failed.",
-                "detail"  => implode(" | ", $conn->errorInfo())
-            ]);
-            exit;
-        }
-        $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    } elseif ($conn instanceof mysqli) {
-        // mysqli path (with error visibility)
-        mysqli_report(MYSQLI_REPORT_OFF); // we’ll handle errors ourselves
-        $result = $conn->query($sql);
-        if ($result === false) {
-            http_response_code(500);
-            echo json_encode([
-                "success" => false,
-                "error"   => "Query failed.",
-                "detail"  => $conn->error
-            ]);
-            exit;
-        }
-        while ($row = $result->fetch_assoc()) {
-            $appointments[] = $row;
-        }
-
-    } else {
-        http_response_code(500);
-        echo json_encode([
-            "success" => false,
-            "error"   => "Unknown DB connection type."
-        ]);
-        exit;
-    }
+    $stmt = $pdo->query($sql);
+    $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Optional: default icon if null
     foreach ($appointments as &$row) {
