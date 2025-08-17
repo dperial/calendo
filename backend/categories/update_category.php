@@ -1,6 +1,7 @@
 <?php
-header("Content-Type: application/json");
-// include '../db_connect.php';
+require_once __DIR__ . '/../bootstrap.php';
+allowMethods('POST', 'PUT');
+
 require_once __DIR__ . '/../db.php';
 $pdo = getPdo();
 

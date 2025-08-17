@@ -1,27 +1,12 @@
 <?php
-declare(strict_types=1);
-
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
-
-if (($_SERVER['REQUEST_METHOD'] ?? 'POST') === 'OPTIONS') {
-  http_response_code(204); exit; // CORS preflight
-}
+require_once __DIR__ . '/../bootstrap.php';
+allowMethods('POST', 'DELETE');
 
 require_once __DIR__ . '/../db.php';
 $pdo = getPdo();
 
 try {
-    $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
-    if ($method !== 'POST' && $method !== 'DELETE') {
-        http_response_code(405);
-        echo json_encode(["success" => false, "error" => "Method not allowed"]);
-        exit;
-    }
-
-    // Read JSON body (preferred); fall back to querystring for DELETE?id=123
+  // Read JSON body (preferred); fall back to querystring for DELETE?id=123
     $raw  = file_get_contents("php://input");
     $data = [];
     if ($raw !== '' && $raw !== false) {

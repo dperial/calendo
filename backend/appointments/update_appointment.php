@@ -1,8 +1,7 @@
 <?php
 
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: PUT, POST");
+require_once __DIR__ . '/../bootstrap.php';
+allowMethods('PUT', 'POST');
 
 require_once __DIR__ . '/../helper.php';
 require_once __DIR__ . '/../db.php';
@@ -11,13 +10,6 @@ date_default_timezone_set('Europe/Berlin');
 $pdo = getPdo();
 
 try {
-    $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
-    if ($method !== 'PUT' && $method !== 'POST') {
-        http_response_code(405);
-        echo json_encode(["success" => false, "error" => "Method not allowed"]);
-        exit;
-    }
-
     $raw = file_get_contents("php://input");
     if ($raw === '' || $raw === false) {
         throw new RuntimeException("Empty request body");
