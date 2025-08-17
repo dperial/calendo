@@ -34,8 +34,9 @@ setRenderFunction(renderAppointments);
 
 function cardHtml(a){return`<div class="col-md-6 col-lg-4 mb-4">
 <div class="card appointment-card"><div class="card-body position-relative">
- <div class="position-absolute top-0 end-0 p-2">
-   <i class="bi bi-three-dots-vertical text-muted btn-delete" data-id="${a.id}"></i></div>
+  <div class="position-absolute top-0 end-0 p-2">
+   <i class="bi bi-three-dots-vertical text-muted btn-delete" data-id="${a.id}"></i>
+  </div>
  <div class="category-icon icon-${a.category.toLowerCase()}"><i class="bi ${a.icon_class || 'bi-tag'}"></i></div>
  <h5 class="card-title truncate-1">${a.title}</h5>
  <span class="badge text-primary-emphasis bg-primary-subtle d-inline-block mb-2 text-start rounded-pill"><i class="bi bi-calendar-event me-1"></i>${formatDateRange(a.start_date,a.start_time,a.end_date,a.end_time)}</span><br>

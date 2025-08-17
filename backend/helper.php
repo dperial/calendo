@@ -2,9 +2,9 @@
 
 /* helper function to validate appointment status against start and end dates */
 // Returns null if valid, or an error message if invalid
-function validateStatusVsDates($status, $startDT, $endDT = null) {
+function validateStatusVsDates(string $status, \DateTimeInterface $startDT, ?\DateTimeInterface $endDT = null): ?string {
   if (!$startDT) {
-    return ["Bad start date/time format.", $startDT];
+    return ["Bad start date/time format."];
   }
   if ($endDT === false) $endDT = null; // if endDT is not provided, treat it as null
   $now = new DateTime('now');
