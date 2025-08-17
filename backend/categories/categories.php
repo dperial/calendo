@@ -5,10 +5,25 @@ allowMethods('GET');
 require_once __DIR__ . '/../db.php';
 $pdo = getPdo();
 
-$sql = "SELECT c.* FROM categories c ORDER BY c.name";
-$stmt = $pdo->prepare($sql);
-$stmt->execute();
-$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$userId = filter_input(INPUT_GET, 'user_id', FILTER_VALIDATE_INT);
 
-echo json_encode($categories);
+try {
+    if ($userId !== null && $userId !== false) {
+        $stmt = $pdo->prepare('SELECT c.* FROM categories c WHERE c.user_id = :user_id ORDER BY c.name');
+        $stmt->execute([':user_id' => $userId]);
+    } else {
+        $stmt = $pdo->query('SELECT c.* FROM categories c ORDER BY c.name');
+    }
+
+    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode($categories);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Database error',
+        'detail'  => $e->getMessage(),
+    ]);
+}
 ?>
