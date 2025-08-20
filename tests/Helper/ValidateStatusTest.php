@@ -1,7 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-
-require_once __DIR__ . '/../../backend/helper.php';
+use Project\Calendo\Validator;
 
 final class ValidateStatusTest extends TestCase
 {
@@ -16,7 +15,7 @@ final class ValidateStatusTest extends TestCase
         $startDT = new DateTime($start, $tz);
         $endDT   = new DateTime($end,   $tz);
 
-        $err = validateStatusVsDates($status, $startDT, $endDT);
+        $err = Validator::validateStatusVsDates($status, $startDT, $endDT);
 
         if ($expectError !== null) {
             $this->assertSame($expectError, $err);

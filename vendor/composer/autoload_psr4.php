@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Kuaguim\\Calendo\\' => array($baseDir . '/src'),
+    'Project\\Calendo\\' => array($baseDir . '/src'),
 );

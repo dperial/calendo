@@ -1,9 +1,11 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
+require dirname(__DIR__) . '/../vendor/autoload.php';
+require_once dirname(__DIR__) . '/../bootstrap.php';
+use Project\Calendo\Database;
+
 allowMethods('POST');
 
-require_once __DIR__ . '/../db.php';
-$pdo = getPdo();
+$pdo = Database::getPdo();
 
 $data = json_decode(file_get_contents("php://input"), true);
 $appointment_id      = $data['appointment_id'];

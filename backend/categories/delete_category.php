@@ -1,9 +1,11 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
+require dirname(__DIR__) . '/../vendor/autoload.php';
+require_once dirname(__DIR__) . '/../bootstrap.php';
+use Project\Calendo\Database;
+
 allowMethods('POST', 'DELETE');
 
-require_once __DIR__ . '/../db.php';
-$pdo = getPdo();
+$pdo = Database::getPdo();
 
 $id = $_GET['id'];
 $sql = "DELETE FROM categories WHERE id=?";

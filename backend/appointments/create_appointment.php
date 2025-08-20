@@ -1,13 +1,15 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
+require dirname(__DIR__) . '/../vendor/autoload.php';
+require_once dirname(__DIR__) . '/../bootstrap.php';
+use Project\Calendo\Database;
+use Project\Calendo\Validator;
+
 allowMethods('POST');
 
-require_once __DIR__ . '/../helper.php';
-require_once __DIR__ . '/../db.php';
 session_start();
 date_default_timezone_set('Europe/Berlin');
 
-$pdo = getPdo();
+$pdo = Database::getPdo();
 
 try {
   $raw = file_get_contents("php://input");
@@ -49,7 +51,7 @@ try {
   $startDT = new DateTime("$start_date $start_time", $tz);
   $endDT   = new DateTime("$end_date $end_time",   $tz);
 
-  if ($err = validateStatusVsDates($status, $startDT, $endDT)) {
+  if ($err = Validator::validateStatusVsDates($status, $startDT, $endDT)) {
     http_response_code(422);
     echo json_encode(["success"=>false,"error"=>$err]);
     exit;

@@ -1,10 +1,11 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
+require dirname(__DIR__) . '/../vendor/autoload.php';
+require_once dirname(__DIR__) . '/../bootstrap.php';
+use Project\Calendo\Database;
+
 allowMethods('GET');
 
-require_once __DIR__ . '/../helper.php';
-require_once __DIR__ . '/../db.php';
-$pdo = getPdo();
+$pdo = Database::getPdo();
 
 $sql = "
     SELECT
