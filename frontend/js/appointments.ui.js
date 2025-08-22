@@ -30,7 +30,7 @@ export function renderAppointments(list){
   wireDescriptionToggles();  // add expand/collapse buttons
   wireContainerClicks();     // add click handlers for container
 }
-setRenderFunction(renderAppointments);
+// setRenderFunction(renderAppointments);
 
 function cardHtml(a){return`<div class="col-md-6 col-lg-4 mb-4">
 <div class="card appointment-card"><div class="card-body position-relative">
@@ -183,7 +183,7 @@ export function suggestStatus(){
   f.status.value=e<now?"completed": (s<=now&&now<=e?"ongoing":"scheduled");
 }
 ["start_date","start_time","end_date","end_time"].forEach(n=>
-  document.querySelector(`[name='${n}']`).addEventListener("change",suggestStatus));
+  document.querySelector(`[name='${n}']`)?.addEventListener("change",suggestStatus));
 
 /* ───────────────── FORM SUBMIT ───────────────────────── */
 export function setupAppointmentFormHandler(){

@@ -9,3 +9,4 @@ node_modules/
 .github/*
 .phpunit.result.cache
 .phpunit.cache/
+coverage/*

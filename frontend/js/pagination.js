@@ -18,6 +18,7 @@ function renderPage() {
 function renderPagination() {
   const totalPages = Math.ceil(allAppointments.length / pageSize);
   const pager      = document.getElementById("pagination");
+  if (!pager) return; // If there's no pager element, exit early
   pager.innerHTML  = "";
 
   const addItem = (label, page, disabled = false, active = false) => {
